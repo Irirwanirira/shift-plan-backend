@@ -7,11 +7,18 @@ import {
   deleteAbsence
 } from "../services/absence/abscence.service";
 import { formatResponse } from "../utils/format";
+import { findUserById } from "../services/auth/auth.service";
 
 export const createAbsenceController = async (req, res) => {
   const {
-    reason, startDate, endDate, userId
+    reason, startDate, endDate
   } = req.body;
+  const { id } = req.user;
+  const user = await findUserById(id);
+  if (!user) {
+    return formatResponse(res, StatusCodes.NOT_FOUND, null, "User not found");
+  }
+  const userId = user.id;
   const absence = await createAbsence({
     reason,
     startDate,
